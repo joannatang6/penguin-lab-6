@@ -55,3 +55,44 @@ penguins2
 - Levene's test for equal variances (analagous to 2-sample f-test)
 - one-way ANOVA
 - post-hoc testing
+
+```{r}
+
+penguins_hists <- ggplot(penguins2, aes(x = flipper_length)) +
+  geom_histogram(aes(fill = common_name)) + # Color bars differently for each common_name
+  facet_wrap(~common_name) # Separates each species into its own graph
+
+penguins_hists
+
+
+penguins_qqplots <- ggplot(penguins2, aes(sample = flipper_length)) +
+  geom_qq() +
+  facet_wrap(~common_name) # Making side-by-side qqplots for each species
+
+penguins_qqplots
+
+
+# Levene's test for equal variances (>2 groups...if you have 2 groups, use the F-test for equal variances)
+
+# We'll use the function leveneTest from the "car" package
+
+# H0: Variances equal
+# HA: Variances unequal
+
+penguins_levene <- leveneTest(flipper_length ~ common_name, data = penguins2)
+
+penguins_levene
+# p = .058, we retain the null hypothesis of equal variances
+
+
+penguins_variances <- penguins2 %>%
+  group_by(common_name) %>% 
+                              summarize(
+                                variance = var(flipper_length)
+                              )
+
+penguins_variances
+# largest variances is less than 4x smallest variance --> satisfies ANOVA assumptions (even if I got a significant result from Levene's Test)
+
+```
+
